@@ -1,21 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 export default function Home() {
   const router = useRouter();
-  const [athlete, setAthlete] = useState<any>(null);
-
-  useEffect(() => {
-    const query = new URLSearchParams(window.location.search);
-    const accessToken = query.get('access_token');
-    const athleteData = query.get('athlete');
-
-    if (accessToken && athleteData) {
-      setAthlete(JSON.parse(athleteData));
-    }
-  }, []);
 
   const handleLogin = () => {
     router.push('/api/auth/strava');
@@ -23,15 +11,14 @@ export default function Home() {
 
   return (
     <div>
-      <h1>Welcome to Sportif AI</h1>
-      {athlete ? (
-        <div>
-          <h2>Hello, {athlete.firstname} {athlete.lastname}</h2>
-          <img src={athlete.profile} alt="Athlete profile" />
+      <div className='flex justify-center items-center min-h-full'>
+        <div className='w-80'>
+          <h1 className='text-4xl font-bold text-center text-[#fc5200] my-4'>
+              Welcome to Sportif AI
+          </h1>
+          <button className='bg-[#fc5200] text-white border-transparent rounded w-full inline-flex items-center justify-center font-semibold py-2 px-8 text-center transition-colors duration-200 ease-in-out select-none whitespace-nowrap align-middle' onClick={handleLogin}>Login with Strava</button>
         </div>
-      ) : (
-        <button onClick={handleLogin}>Login with Strava</button>
-      )}
+      </div>
     </div>
   );
 }
