@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Dashboard from '@/components/component/dashboard';
+import Image from 'next/image';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function DashboardPage() {
       {athlete ? (
         <div>
           <h2>Hello, {athlete.firstname} {athlete.lastname}</h2>
-          <img src={athlete.profile} alt="Athlete profile" />
+          <Image src={athlete.profile} alt="Athlete profile" />
           <Dashboard accessToken={accessToken} />
         </div>
       ) : (
