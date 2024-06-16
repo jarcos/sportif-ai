@@ -9,16 +9,17 @@ interface Activity {
 
 interface TimeseriesChartProps {
   accessToken: string | null;
+  athleteId: number;
 }
 
-const TimeseriesChart: React.FC<TimeseriesChartProps> = ({ accessToken }) => {
+const TimeseriesChart: React.FC<TimeseriesChartProps> = ({ accessToken, athleteId }) => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (accessToken) {
-      fetch(`/api/strava/activities?access_token=${accessToken}`)
+    if (accessToken && athleteId) {
+      fetch(`/api/strava/activities?athleteId=${athleteId}`)
         .then(response => {
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -34,7 +35,7 @@ const TimeseriesChart: React.FC<TimeseriesChartProps> = ({ accessToken }) => {
           setLoading(false);
         });
     }
-  }, [accessToken]);
+  }, [accessToken, athleteId]);
 
   if (loading) {
     return <div className="card">Loading...</div>;

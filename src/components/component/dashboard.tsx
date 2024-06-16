@@ -19,9 +19,7 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ accessToken, athlete }) => {
   return (
     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-      <h2>Hello, {athlete.firstname} {athlete.lastname}</h2>
-      <Image src={athlete.profile} alt="Athlete profile" width={50} height={50} />
-      <TimeseriesChart accessToken={accessToken} />
+      <TimeseriesChart accessToken={accessToken} athleteId={athlete.id} />
       <GoalCard />
       <TrainingCard />
     </div>
