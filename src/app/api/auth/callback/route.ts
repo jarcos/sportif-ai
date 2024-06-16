@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
+import { kv } from '@vercel/kv';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -21,7 +22,11 @@ export async function GET(req: NextRequest) {
 
     const { access_token, athlete } = response.data;
 
-    return NextResponse.redirect(new URL(`/dashboard?access_token=${access_token}&athlete=${encodeURIComponent(JSON.stringify(athlete))}`, req.url));
+    // Store data in Vercel KV
+    await kv.set(`access_token:${athlete.id}`, access_token);
+    await kv.set(`athlete:${athlete.id}`, JSON.stringify(athlete));
+
+    return NextResponse.redirect(new URL(`/dashboard?athleteId=${athlete.id}`, req.url));
   } catch (error) {
     console.error('Failed to exchange code for token:', error);
     return NextResponse.json({ error: 'Failed to exchange code for token' }, { status: 500 });
