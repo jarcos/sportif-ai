@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
+interface Activity {
+  type: string;
+  // Add other relevant properties of the activity if needed
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const access_token = searchParams.get('access_token');
@@ -20,7 +25,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Filter for running activities and limit to 10
-    const runningActivities = response.data.filter(activity => activity.type === 'Run').slice(0, 10);
+    const runningActivities = response.data.filter((activity: Activity) => activity.type === 'Run').slice(0, 10);
 
     return NextResponse.json(runningActivities, { status: 200 });
   } catch (error) {
