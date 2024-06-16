@@ -1,26 +1,29 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { code } = req.query;
-  debugger;
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const code = searchParams.get('code');
 
   if (!code) {
-    return res.status(400).send('No code found');
+    return NextResponse.json({ error: 'No code found' }, { status: 400 });
   }
 
   try {
-    const response = await axios.post('https://www.strava.com/oauth/token', {
-      client_id: process.env.STRAVA_CLIENT_ID,
-      client_secret: process.env.STRAVA_CLIENT_SECRET,
-      code,
-      grant_type: 'authorization_code',
+    const response = await axios.post('https://www.strava.com/oauth/token', null, {
+      params: {
+        client_id: process.env.STRAVA_CLIENT_ID,
+        client_secret: process.env.STRAVA_CLIENT_SECRET,
+        code,
+        grant_type: 'authorization_code',
+      },
     });
 
     const { access_token, athlete } = response.data;
 
-    res.redirect(302, `/?access_token=${access_token}&athlete=${encodeURIComponent(JSON.stringify(athlete))}`);
+    return NextResponse.redirect(new URL(`/dashboard?access_token=${access_token}&athlete=${encodeURIComponent(JSON.stringify(athlete))}`, req.url));
   } catch (error) {
-    res.status(500).send('Error exchanging code for token');
+    console.error('Failed to exchange code for token:', error);
+    return NextResponse.json({ error: 'Failed to exchange code for token' }, { status: 500 });
   }
 }
