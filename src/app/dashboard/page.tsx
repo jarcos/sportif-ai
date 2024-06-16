@@ -28,7 +28,7 @@ export default function DashboardPage() {
       {athlete ? (
         <div>
           <h2>Hello, {athlete.firstname} {athlete.lastname}</h2>
-          <Image src={athlete.profile} alt="Athlete profile" />
+          <Image src={athlete.profile} alt="Athlete profile" width={50} height={50} />
           <Dashboard accessToken={accessToken} />
         </div>
       ) : (
