@@ -1,11 +1,12 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
-export default async function GET(req: NextApiRequest, res: NextApiResponse) {
-  const { access_token } = req.query;
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const access_token = searchParams.get('access_token');
 
   if (!access_token) {
-    return res.status(400).json({ error: 'Access token is required' });
+    return NextResponse.json({ error: 'Access token is required' }, { status: 400 });
   }
 
   try {
@@ -21,8 +22,9 @@ export default async function GET(req: NextApiRequest, res: NextApiResponse) {
     // Filter for running activities and limit to 10
     const runningActivities = response.data.filter(activity => activity.type === 'Run').slice(0, 10);
 
-    res.status(200).json(runningActivities);
+    return NextResponse.json(runningActivities, { status: 200 });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch activities' });
+    console.error('Failed to fetch activities:', error);
+    return NextResponse.json({ error: 'Failed to fetch activities' }, { status: 500 });
   }
 }
