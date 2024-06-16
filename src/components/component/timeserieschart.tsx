@@ -7,16 +7,42 @@ interface Activity {
   start_date: string;
 }
 
-export default function TimeseriesChart({ accessToken }: { accessToken: string }) {
+interface TimeseriesChartProps {
+  accessToken: string | null;
+}
+
+const TimeseriesChart: React.FC<TimeseriesChartProps> = ({ accessToken }) => {
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (accessToken) {
       fetch(`/api/strava/activities?access_token=${accessToken}`)
-        .then(response => response.json())
-        .then(data => setActivities(data));
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          setActivities(data);
+          setLoading(false);
+        })
+        .catch(error => {
+          setError(error.message);
+          setLoading(false);
+        });
     }
   }, [accessToken]);
+
+  if (loading) {
+    return <div className="card">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="card">Error: {error}</div>;
+  }
 
   return (
     <div className="card">
@@ -30,4 +56,6 @@ export default function TimeseriesChart({ accessToken }: { accessToken: string }
       </ul>
     </div>
   );
-}
+};
+
+export default TimeseriesChart;
