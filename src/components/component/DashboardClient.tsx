@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Dashboard from '@/components/component/dashboard';
-import Image from 'next/image';
 
 const getCookie = (name: string) => {
   const value = `; ${document.cookie}`;

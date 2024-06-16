@@ -1,14 +1,11 @@
 import Link from "next/link";
-import Cookies from 'js-cookie';
+import { cookies } from 'next/headers'
 import Image from 'next/image';
 
 export function Header() {
-  let athlete = null;
-  const athleteCookie = Cookies.get('athlete');
-
-  if (athleteCookie) {
-    athlete = JSON.parse(athleteCookie);
-  }
+  const cookieStore = cookies();
+  const athleteCookie = cookieStore.get('athlete');
+  const athlete = athleteCookie ? JSON.parse(athleteCookie.value) : null;
 
   return (
     <header className="bg-[#fc5200] py-4 px-6 text-white">
