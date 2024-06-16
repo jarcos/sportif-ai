@@ -26,7 +26,11 @@ export async function GET(req: NextRequest) {
     await kv.set(`access_token:${athlete.id}`, access_token);
     await kv.set(`athlete:${athlete.id}`, JSON.stringify(athlete));
 
-    return NextResponse.redirect(new URL(`/dashboard?athleteId=${athlete.id}`, req.url));
+    const redirectUrl = new URL(`/dashboard`, req.url);
+    redirectUrl.searchParams.append('access_token', access_token);
+    redirectUrl.searchParams.append('athlete', JSON.stringify(athlete));
+
+    return NextResponse.redirect(redirectUrl);
   } catch (error) {
     console.error('Failed to exchange code for token:', error);
     return NextResponse.json({ error: 'Failed to exchange code for token' }, { status: 500 });
