@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react';
+import { ResponsiveLine } from '@nivo/line';
 
 interface Activity {
   id: number;
   name: string;
   distance: number;
+  moving_time: number;
   start_date: string;
+  type: string;
+  average_speed: number;
+  average_heartrate: number;
 }
 
 interface TimeseriesChartProps {
@@ -27,7 +32,8 @@ const TimeseriesChart: React.FC<TimeseriesChartProps> = ({ accessToken, athleteI
           return response.json();
         })
         .then(data => {
-          setActivities(data);
+          const runningActivities = data.filter((activity: Activity) => activity.type === 'Run');
+          setActivities(runningActivities);
           setLoading(false);
         })
         .catch(error => {
@@ -45,16 +51,112 @@ const TimeseriesChart: React.FC<TimeseriesChartProps> = ({ accessToken, athleteI
     return <div className="card">Error: {error}</div>;
   }
 
+  const totalDistance = activities.reduce((total, activity) => total + activity.distance, 0);
+  const totalTime = activities.reduce((total, activity) => total + activity.moving_time, 0);
+  const avgPace = (totalTime / 60) / (totalDistance / 1000);
+  const minutes = Math.floor(avgPace);
+  const seconds = Math.round((avgPace - minutes) * 60);
+  const avgHeartRate = activities.reduce((total, activity) => total + (activity.average_heartrate || 0), 0) / activities.length;
+
+  const graphData = activities.map(activity => ({
+    x: activity.start_date,
+    y: activity.distance,
+  }));
+
   return (
-    <div className="card">
-      <h3>Latest Running Activities</h3>
-      <ul>
-        {activities.map(activity => (
-          <li key={activity.id}>
-            {activity.name} - {activity.distance} meters on {new Date(activity.start_date).toLocaleDateString()}
-          </li>
-        ))}
-      </ul>
+    <div className="bg-white rounded-lg shadow-md p-6">
+      <h2 className="text-2xl font-bold mb-4">Dashboard</h2>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <h3 className="text-lg font-medium mb-2">Total Distance</h3>
+          <p className="text-3xl font-bold">{(totalDistance / 1000).toFixed(2)} km</p>
+        </div>
+        <div>
+          <h3 className="text-lg font-medium mb-2">Total Time</h3>
+          <p className="text-3xl font-bold">{(totalTime / 3600).toFixed(2)} hrs</p>
+        </div>
+        <div>
+          <h3 className="text-lg font-medium mb-2">Avg. Pace</h3>
+          <p className="text-3xl font-bold">{`${minutes}:${seconds.toString().padStart(2, '0')} min/km`}</p>
+        </div>
+        <div>
+          <h3 className="text-lg font-medium mb-2">Avg. Heart Rate</h3>
+          <p className="text-3xl font-bold">{Math.round(avgHeartRate)} bpm</p>
+        </div>
+      </div>
+      <div className="mt-6">
+        <h3 className='text-2xl font-bold mb-4'>Latest Running Activities</h3>
+        <ul>
+          {activities.map(activity => (
+            <li key={activity.id} className="mb-2">
+              <a
+                href={`https://www.strava.com/activities/${activity.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700 hover:underline active:text-blue-800"
+              >
+                {activity.name} - {new Date(activity.start_date).toLocaleDateString()}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <ResponsiveLine
+          data={[
+            {
+              id: 'Distance',
+              data: graphData,
+            },
+          ]}
+          margin={{ top: 10, right: 20, bottom: 40, left: 40 }}
+          xScale={{
+            type: 'time',
+            format: '%Y-%m-%d',
+            useUTC: false,
+            precision: 'day',
+          }}
+          xFormat="time:%Y-%m-%d"
+          yScale={{
+            type: 'linear',
+            min: 0,
+            max: 'auto',
+          }}
+          axisTop={null}
+          axisRight={null}
+          axisBottom={{
+            tickSize: 0,
+            tickPadding: 16,
+            format: '%d',
+            tickValues: 'every 30 day',
+          }}
+          axisLeft={{
+            tickSize: 0,
+            tickValues: 5,
+            tickPadding: 16,
+          }}
+          colors={['#2563eb']}
+          pointSize={6}
+          useMesh={true}
+          gridYValues={6}
+          theme={{
+            tooltip: {
+              chip: {
+                borderRadius: '9999px',
+              },
+              container: {
+                fontSize: '12px',
+                textTransform: 'capitalize',
+                borderRadius: '6px',
+              },
+            },
+            grid: {
+              line: {
+                stroke: '#f3f4f6',
+              },
+            },
+          }}
+          role="application"
+        />
+      </div>
     </div>
   );
 };

@@ -15,11 +15,19 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Access token not found' }, { status: 404 });
   }
 
+  const after = new Date('2020-05-18').getTime() / 1000;
+  const before = new Date('2021-06-30').getTime() / 1000;
+
   try {
     const response = await axios.get('https://www.strava.com/api/v3/athlete/activities', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+            per_page: 200,
+            before,
+            after,
+        },
     });
 
     return NextResponse.json(response.data, { status: 200 });
