@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ResponsiveLine } from '@nivo/line';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface Activity {
   id: number;
@@ -44,7 +45,7 @@ const TimeseriesChart: React.FC<TimeseriesChartProps> = ({ accessToken, athleteI
   }, [accessToken, athleteId]);
 
   if (loading) {
-    return <div className="card">Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   if (error) {

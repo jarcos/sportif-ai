@@ -18,17 +18,11 @@ export function Header({ athlete }: { athlete: any }) {
           Sportif-AI
         </Link>
         <nav className="space-x-4">
-          <Link className="hover:underline" href="#">
+          <Link className="hover:underline" href="/dashboard">
             Dashboard
           </Link>
-          <Link className="hover:underline" href="#">
-            Goals
-          </Link>
-          <Link className="hover:underline" href="#">
-            Training
-          </Link>
-          <Link className="hover:underline" href="#">
-            Settings
+          <Link className="hover:underline" href="/help">
+            Help
           </Link>
         </nav>
         {athlete && (
