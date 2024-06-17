@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
-import { kv } from '@vercel/kv';
+import {cookies} from 'next/headers';
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const athleteId = searchParams.get('athleteId');
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get('access_token');
 
-  if (!athleteId) {
-    return NextResponse.json({ error: 'Athlete ID is required' }, { status: 400 });
-  }
-
-  const accessToken = await kv.get<string>(`access_token:${athleteId}`);
   if (!accessToken) {
     return NextResponse.json({ error: 'Access token not found' }, { status: 404 });
   }
@@ -21,7 +16,7 @@ export async function GET(req: NextRequest) {
   try {
     const response = await axios.get('https://www.strava.com/api/v3/athlete/activities', {
         headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${accessToken.value}`,
         },
         params: {
             per_page: 200,
