@@ -8,7 +8,7 @@ export default function Help() {
   return (
     <div>
       <div className='flex justify-center items-center min-h-full'>
-        <div className='w-400'>
+        <div className='max-w-[800px]'>
           <h1 className='text-4xl font-bold text-center text-[#fc5200] my-4'>
             Sportif AI
           </h1>
@@ -25,7 +25,7 @@ export default function Help() {
             Join us today and take your training to the next level!
           </p>
           <button
-            className='bg-[#fc5200] text-white border-transparent rounded w-full inline-flex items-center justify-center font-semibold py-2 px-8 text-center transition-colors duration-200 ease-in-out select-none whitespace-nowrap align-middle'
+            className='max-w-[200px] bg-[#fc5200] text-white border-transparent rounded w-full inline-flex items-center justify-center font-semibold py-2 px-8 text-center transition-colors duration-200 ease-in-out select-none whitespace-nowrap align-middle'
             onClick={() => router.push('/')}
           >
             Go to the Dashboard
