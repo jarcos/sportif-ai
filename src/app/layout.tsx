@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/component/header";
 import { Footer } from "@/components/component/footer";
+import { cookies } from 'next/headers';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -19,12 +20,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = cookies();
+  const athleteCookie = cookieStore.get('athlete');
+  const athlete = athleteCookie ? JSON.parse(athleteCookie.value) : null;
+
   return (
     <html lang="en">
       <body className={inter.className}>
       <div className="flex min-h-screen flex-col">
-        <Header />
-              <main className="flex-1 bg-[#00000] py-8">
+        <Header athlete={athlete} />
+        <main className="flex-1 bg-[#00000] py-8">
         <div className="container mx-auto">
           {children}
         </div>
