@@ -1,17 +1,31 @@
-'use client';
-
 import { useState } from 'react';
-import { Message, useAssistant } from '@ai-sdk/react';
 import { Button } from "@/components/ui/button";
 import Modal from '@/components/ui/Modal';
 
 export function TrainingCard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { status, messages, input, submitMessage, handleInputChange } = useAssistant({ api: '/api/training/recommendations' });
+  const [modalContent, setModalContent] = useState<{
+    type: string;
+    description: string;
+    steps: string[];
+  } | null>(null);
 
-  const handleViewWorkout = (workoutType: string) => {
-    submitMessage({ target: { value: workoutType } });
-    setIsModalOpen(true);
+  const handleViewWorkout = async (workoutType: string) => {
+    try {
+      const response = await fetch('/api/training/recommendations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ workoutType }),
+      });
+
+      const data = await response.json();
+      setModalContent(data.workout);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching workout:', error);
+    }
   };
 
   return (
@@ -37,26 +51,17 @@ export function TrainingCard() {
         </div>
       </div>
 
-      {isModalOpen && (
+      {isModalOpen && modalContent && (
         <Modal onClose={() => setIsModalOpen(false)}>
           <h2 className="text-xl font-bold mb-4">Workout Details</h2>
-          <div>
-            {messages.map((m: Message) => (
-              <div key={m.id}>
-                <strong>{`${m.role}: `}</strong>
-                {m.role !== 'data' && m.content}
-                {m.role === 'data' && (
-                  <>
-                    {(m.data as any).description}
-                    <br />
-                    <pre className={'bg-gray-200'}>
-                      {JSON.stringify(m.data, null, 2)}
-                    </pre>
-                  </>
-                )}
-              </div>
+          <p><strong>Type:</strong> {modalContent.type}</p>
+          <p><strong>Description:</strong> {modalContent.description}</p>
+          <h3 className="text-lg font-medium mb-2 mt-4">Steps</h3>
+          <ul className="list-disc list-inside">
+            {modalContent.steps.map((step, index) => (
+              <li key={index}>{step}</li>
             ))}
-          </div>
+          </ul>
         </Modal>
       )}
     </div>
