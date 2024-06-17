@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { useState, Suspense, lazy } from 'react';
 import { Button } from "@/components/ui/button";
 import Modal from '@/components/ui/Modal';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+
+const WorkoutDetails = lazy(() => import('./WorkoutDetails'));
 
 export function TrainingCard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -9,8 +12,12 @@ export function TrainingCard() {
     description: string;
     steps: string[];
   } | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleViewWorkout = async (workoutType: string) => {
+    setLoading(true);
+    setIsModalOpen(true);
+
     try {
       const response = await fetch('/api/training/recommendations', {
         method: 'POST',
@@ -22,9 +29,10 @@ export function TrainingCard() {
 
       const data = await response.json();
       setModalContent(data.workout);
-      setIsModalOpen(true);
     } catch (error) {
       console.error('Error fetching workout:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,17 +59,17 @@ export function TrainingCard() {
         </div>
       </div>
 
-      {isModalOpen && modalContent && (
+      {isModalOpen && (
         <Modal onClose={() => setIsModalOpen(false)}>
-          <h2 className="text-xl font-bold mb-4">Workout Details</h2>
-          <p><strong>Type:</strong> {modalContent.type}</p>
-          <p><strong>Description:</strong> {modalContent.description}</p>
-          <h3 className="text-lg font-medium mb-2 mt-4">Steps</h3>
-          <ul className="list-disc list-inside">
-            {modalContent.steps.map((step, index) => (
-              <li key={index}>{step}</li>
-            ))}
-          </ul>
+          <Suspense fallback={<LoadingSpinner />}>
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              modalContent && (
+                <WorkoutDetails modalContent={modalContent} />
+              )
+            )}
+          </Suspense>
         </Modal>
       )}
     </div>
