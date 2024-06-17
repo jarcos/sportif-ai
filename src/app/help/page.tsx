@@ -21,9 +21,6 @@ export default function Help() {
           <p className='text-left text-gray-700 my-4'>
             Our AI-driven technology analyzes your activities and offers customized workouts, ensuring you get the most out of your training. Whether you are preparing for a race or just looking to stay fit, Sportif AI has the tools you need.
           </p>
-          <p className='text-left text-gray-700 my-4'>
-            Join us today and take your training to the next level!
-          </p>
           <button
             className='max-w-[200px] bg-[#fc5200] text-white border-transparent rounded w-full inline-flex items-center justify-center font-semibold py-2 px-8 text-center transition-colors duration-200 ease-in-out select-none whitespace-nowrap align-middle'
             onClick={() => router.push('/')}
